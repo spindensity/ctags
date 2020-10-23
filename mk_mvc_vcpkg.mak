@@ -4,7 +4,8 @@
 # To use from the command line:
 # 1. From the Start Menu "Visual Studio 2019" -> "x64 Native Tools Command Prompt for VS 2019"
 # 2. In the command prompt that opens goto the directory containing the sources
-# 3. Execute: nmake -f mk_mvc_vcpkg.mak VCPKG_ROOT=/path/to/vcpkg
+# 3. Install dependencies: vcpkg install libiconv:x64-windows-static libyaml:x64-windows-static libxml2:x64-windows-static jansson:x64-windows-static
+# 4. Execute: nmake -f mk_mvc_vcpkg.mak VCPKG_ROOT=/path/to/vcpkg
 #
 
 include source.mak
@@ -27,7 +28,6 @@ ALL_OBJS = $(ALL_SRCS:.c=.obj) $(REGEX_OBJS) $(FNMATCH_OBJS) $(WIN32_OBJS) $(PEG
 READTAGS_OBJS = $(READTAGS_SRCS:.c=.obj)
 
 # Use vcpkg to support extra features:
-# vcpkg install libiconv:x64-windows-static libyaml:x64-windows-static libxml2:x64-windows-static jansson:x64-windows-static
 INCLUDES = /I$(VCPKG_ROOT)/installed/x64-windows-static/include $(INCLUDES)
 
 DEFINES = $(DEFINES) -DHAVE_ICONV
