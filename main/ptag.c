@@ -188,9 +188,13 @@ static ptagDesc ptagDescs [] = {
 	  "the limit of pattern length",
 	  ptagMakePatternLengthLimit,
 	  PTAGF_COMMON },
-	{ false, "TAG_PROC_CWD",
+	{ true, "TAG_PROC_CWD",
 	  "the current working directory of the tags generator",
 	  ptagMakeProcCwd,
+	  PTAGF_COMMON },
+	{ true, "TAG_OUTPUT_EXCMD",
+	  "the excmd: number, pattern, mixed, or combine",
+	  ptagMakeCtagsOutputExcmd,
 	  PTAGF_COMMON },
 };
 

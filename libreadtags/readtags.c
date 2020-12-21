@@ -113,7 +113,7 @@ static int xdigitValue (char digit)
  */
 static int readTagCharacter (const char **s)
 {
-	int c = **s;
+	int c = **(const unsigned char **)s;
 
 	(*s)++;
 
@@ -160,7 +160,7 @@ static int taguppercmp (const char *s1, const char *s2)
 	int c1, c2;
 	do
 	{
-		c1 = *s1++;
+		c1 = (unsigned char)*s1++;
 		c2 = readTagCharacter (&s2);
 
 		result = toupper (c1) - toupper (c2);
@@ -174,7 +174,7 @@ static int tagnuppercmp (const char *s1, const char *s2, size_t n)
 	int c1, c2;
 	do
 	{
-		c1 = *s1++;
+		c1 = (unsigned char)*s1++;
 		c2 = readTagCharacter (&s2);
 
 		result = toupper (c1) - toupper (c2);
@@ -188,7 +188,7 @@ static int tagcmp (const char *s1, const char *s2)
 	int c1, c2;
 	do
 	{
-		c1 = *s1++;
+		c1 = (unsigned char)*s1++;
 		c2 = readTagCharacter (&s2);
 
 		result = c1 - c2;
@@ -259,7 +259,7 @@ static void copyName (tagFile *const file)
 	file->name.buffer [length] = '\0';
 }
 
-static int readTagLineRaw (tagFile *const file)
+static int readTagLineRaw (tagFile *const file, int *err)
 {
 	int result = 1;
 	int reReadLine;
@@ -281,8 +281,13 @@ static int readTagLineRaw (tagFile *const file)
 		if (line == NULL)
 		{
 			/* read error */
+			if (err)
+				*err = 0;
 			if (! feof (file->fp))
-				perror ("readTagLine");
+			{
+				if (err)
+					*err = errno;
+			}
 			result = 0;
 		}
 		else if (*pLastChar != '\0'  &&
@@ -309,14 +314,19 @@ static int readTagLineRaw (tagFile *const file)
 	return result;
 }
 
-static int readTagLine (tagFile *const file)
+static int readTagLineFull (tagFile *const file, int *err)
 {
 	int result;
 	do
 	{
-		result = readTagLineRaw (file);
+		result = readTagLineRaw (file, err);
 	} while (result && *file->name.buffer == '\0');
 	return result;
+}
+
+static int readTagLine (tagFile *const file)
+{
+	return readTagLineFull (file, NULL);
 }
 
 static tagResult growFields (tagFile *const file)
@@ -574,9 +584,10 @@ static int isPseudoTagLine (const char *buffer)
 	return (strncmp (buffer, PseudoTagPrefix, PseudoTagPrefixLength) == 0);
 }
 
-static void readPseudoTags (tagFile *const file, tagFileInfo *const info)
+static int readPseudoTags (tagFile *const file, tagFileInfo *const info)
 {
 	fpos_t startOfLine;
+	int err = 0;
 	const size_t prefixLength = strlen (PseudoTagPrefix);
 	if (info != NULL)
 	{
@@ -590,7 +601,7 @@ static void readPseudoTags (tagFile *const file, tagFileInfo *const info)
 	while (1)
 	{
 		fgetpos (file->fp, &startOfLine);
-		if (! readTagLine (file))
+		if (! readTagLineFull (file, &err))
 			break;
 		if (!isPseudoTagLine (file->line.buffer))
 			break;
@@ -625,6 +636,7 @@ static void readPseudoTags (tagFile *const file, tagFileInfo *const info)
 		}
 	}
 	fsetpos (file->fp, &startOfLine);
+	return err;
 }
 
 static int doesFilePointPseudoTag (tagFile *const file, void *unused)
@@ -684,7 +696,12 @@ static tagFile *initialize (const char *const filePath, tagFileInfo *const info)
 				goto file_error;
 			}
 			rewind (result->fp);
-			readPseudoTags (result, info);
+
+			if (info)
+				info->status.error_number = readPseudoTags (result, info);
+			if (info && info->status.error_number)
+				goto file_error;
+
 			if (info)
 				info->status.opened = 1;
 			result->initialized = 1;
@@ -698,6 +715,8 @@ static tagFile *initialize (const char *const filePath, tagFileInfo *const info)
 	free (result->line.buffer);
 	free (result->name.buffer);
 	free (result->fields.list);
+	if (result->fp)
+		fclose (result->fp);
 	free (result);
 	if (info)
 		info->status.opened = 0;
@@ -912,14 +931,14 @@ static tagResult find (tagFile *const file, tagEntry *const entry,
 		(file->sortMethod == TAG_FOLDSORTED  &&  file->search.ignorecase))
 	{
 #ifdef DEBUG
-		printf ("<performing binary search>\n");
+		fputs ("<performing binary search>\n", stderr);
 #endif
 		result = findBinary (file);
 	}
 	else
 	{
 #ifdef DEBUG
-		printf ("<performing sequential search>\n");
+		fputs ("<performing sequential search>\n", stderr);
 #endif
 		result = findSequential (file);
 	}

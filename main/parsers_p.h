@@ -43,6 +43,8 @@
 
 /* Add the name of any new parser definition function here */
 #define PARSER_LIST \
+	AbaqusParser, \
+	AbcParser, \
 	AdaParser, \
 	AntParser, \
 	AsciidocParser, \
@@ -64,6 +66,8 @@
 	CsharpParser, \
 	CtagsParser, \
 	CobolParser, \
+	CobolFreeParser, \
+	CobolVariableParser, \
 	CUDAParser, \
 	DParser, \
 	DiffParser, \
@@ -81,6 +85,8 @@
 	FyppParser,	   \
 	GdbinitParser, \
 	GoParser, \
+	HaskellParser, \
+	HaxeParser, \
 	HtmlParser, \
 	IniconfParser, \
 	InkoParser, \
@@ -89,15 +95,18 @@
 	JavaPropertiesParser, \
 	JavaScriptParser, \
 	JsonParser, \
+	JuliaParser, \
 	KconfigParser, \
 	LdScriptParser, \
 	LispParser, \
+	LiterateHaskellParser, \
 	LuaParser, \
 	M4Parser, \
 	ManParser, \
 	MakefileParser, \
 	MarkdownParser, \
 	MatLabParser, \
+	MesonParser, \
 	MooseParser, \
 	MyrddinParser, \
 	NsisParser, \
@@ -119,6 +128,7 @@
 	QemuHXParser, \
 	QtMocParser, \
 	RParser, \
+	R6ClassParser, \
 	RSpecParser, \
 	RexxParser, \
 	RobotParser, \
@@ -126,6 +136,7 @@
 	RstParser, \
 	RubyParser, \
 	RustParser, \
+	S4ClassParser, \
 	SchemeParser, \
 	SCSSParser, \
 	ShParser, \
@@ -139,6 +150,7 @@
 	TexParser, \
 	TexBeamerParser, \
 	TTCNParser, \
+	Txt2tagsParser, \
 	TypeScriptParser, \
 	VeraParser, \
 	VerilogParser, \

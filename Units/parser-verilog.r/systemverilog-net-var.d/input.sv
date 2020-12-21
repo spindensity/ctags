@@ -32,12 +32,12 @@ module rlMod(input interconnect [0:1] iBus);
 endmodule : rlMod
 
 // 6.7 Net declarations
-module Net_declarations
+module Net_declarations;
   // 6.7.1 Net declarations with built-in net types
-  trireg (large) logic #(0,0,0) cap1; // FIXME: ignored
+  trireg (large) logic #(0,0,0) cap1;
   typedef logic [31:0] addressT;
-  wire addressT w1; // FIXME: ignored
-  wire struct packed { logic ecc; logic [7:0] data; } memsig; // FIXME: ignored -> memsig
+  wire addressT w1;
+  wire struct packed { logic ecc; logic [7:0] data; } memsig;
 
   wire w; // equivalent to "wire logic w;"
   wire logic w;
@@ -50,7 +50,7 @@ module Net_declarations
 
   // 6.7.2 Net declarations with user-defined nettypes
   nettype T wT;
-  nettype T wTsum with Tsum;  // FIXME: 
+  nettype T wTsum with Tsum;
   wT w1;
   wT w2[8];
   wTsum w3;
@@ -67,7 +67,7 @@ module Variable_declarations;
 
   var v; // equivalent to "var logic v;"
   var [15:0] vw; // equivalent to "var logic [15:0] vw;"
-  var enum bit { clear, error } status; // FIXME: ignored
+  var enum bit { clear, error } status;
   input var logic data_in;
   var reg r;
 
@@ -145,14 +145,20 @@ interface intf_i;
   typedef int data_t;
 endinterface
 
+// interface based typedef
 module sub(intf_i p);
-  typedef p.data_t my_data_t; // FIXME: p -> p.data_t?
+  typedef p.data_t my_data_t;
   my_data_t data;
 endmodule
 
+// interface based typedef with constant bit select
+module cbs;
+  typedef p[10].data_t cbs_t;
+endmodule
+
 module user_define_types_1;
-typedef enum type_identifier; // FIXME: 
   // forward typedef
+  typedef enum type_identifier;
   typedef struct type_identifier;
   typedef union type_identifier;
   typedef class type_identifier;
@@ -160,13 +166,65 @@ typedef enum type_identifier; // FIXME:
   typedef type_identifier;
 endmodule
 
+// 6.19 Enumerations
+module enum_test;
+  enum {red, yellow, green} light1, light2; // anonymous int type
+  // Syntax error: IDLE=2'b00, XX=2'bx <ERROR>, S1=2'b01, S2=2'b10
+  //enum bit [1:0] {IDLE, XX='x, S1=2'b01, S2=2'b10} state, next;
+  // Correct: IDLE=0, XX='x, S1=1, S2=2
+  enum integer {IDLE, XX='x, S1='b01, S2='b10} state, next;
+  // Syntax error: IDLE=0, XX='x, S1=??, S2=??
+  //enum integer {IDLE, XX='x, S1, S2} state, next;
+  enum {bronze=3, silver, gold} medal; // silver=4, gold=5
+
+  // Correct declaration - bronze and gold are unsized
+  enum bit [3:0] {bronze='h3, silver, gold='h5} medal2;
+  // Correct declaration - bronze and gold sizes are redundant
+  enum bit [3:0] {bronze=4'h3, silver, gold=4'h5} medal3;
+
+  // 6.19.1 Defining new data types as enumerated types
+  typedef enum {NO, YES} boolean;
+  boolean myvar; // named type
+
+  // 6.19.2 Enumerated type ranges
+  typedef enum { add=10, sub[5], jmp[6:8] } E1; // FIXME
+  enum { register[2] = 1, register[2:4] = 10 } vr; // FIXME
+
+  // original
+  enum logic signed [3:0] { foo, bar } [1:0] cmplx_enum1; 
+  enum logic unsigned [3:0] { foo, bar } [] cmplx_enum2; 
+
+endmodule
+
 // 9.4.1 Delay control
 module delay_control #(d, e);
   int rega, regb, regr;
   initial begin
     #10 rega = regb;
-    #d rega = regb; // d is defined as a parameter  FIXME
+    #d rega = regb; // d is defined as a parameter
     #((d+e)/2) rega = regb; // delay is average of d and e
-    #regr regr = regr + 1; // delay is the value in regr  FIXME
+    #regr regr = regr + 1; // delay is the value in regr
+  end
+endmodule
+
+// 10.3 Continuous assignments
+module delay_control_wire #(d, e);
+  wire wirea #10 = wireb;
+  wire wireb #d = wireb;
+  wire wirec #((d+e)/2) = wireb;
+  wire wired #wirer = wirer + 1;
+  wire w$ire, wire$;  // '$' included
+endmodule
+
+// orignal : LRM 5.8 Time literals
+module rst;
+  logic trst_n;
+  initial begin
+    #10.5fs trst_n = 1'b0;
+    #10ps   trst_n = 1'b1;
+    #10ns   trst_n = 1'b0;
+    #10us   trst_n = 1'b1;
+    #10ms   trst_n = 1'b0;
+    #10s    trst_n = 1'b1;
   end
 endmodule

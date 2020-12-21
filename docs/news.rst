@@ -36,6 +36,8 @@ New parsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The following parsers have been added:
 
+* Abaqus
+* Abc
 * Ada
 * AnsiblePlaybook *libyaml*
 * Asciidoc
@@ -59,14 +61,18 @@ The following parsers have been added:
 * Gdbinit script *optlib*
 * Glade *libxml*
 * Go
+* Haskell
+* Haxe
 * Inko *optlib*
 * JavaProperties
 * JSON
+* Julia
 * Kconfig *optlib*
 * GNU linker script(LdScript)
 * Man page *optlib*
 * Markdown *optlib*
 * Maven2 *libxml*
+* MesonBuild (Meson) *optlib*
 * Moose *perl basesd subperser*
 * Myrddin
 * M4
@@ -83,12 +89,14 @@ The following parsers have been added:
 * QemuHX *optlib*
 * QtMoc
 * R
+* R6Class *R based subperser*
 * RelaxNG *libxml*
 * ReStructuredText
 * Robot
 * RpmSpec
 * RSpec *optlib*
 * Rust
+* S4Class *R based subperser*
 * SCSS *optlib*
 * SystemdUnit
 * SystemTap *optlib*
@@ -96,6 +104,7 @@ The following parsers have been added:
 * SVG *libxml*
 * TclOO (see :ref:`The new Tcl parser <tcl>`)
 * TTCN
+* Txt2tags
 * TypeScript
 * Varlink *peg/packcc*
 * WindRes
