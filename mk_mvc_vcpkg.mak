@@ -31,7 +31,7 @@ READTAGS_OBJS = $(READTAGS_SRCS:.c=.obj)
 INCLUDES = /I$(VCPKG_ROOT)/installed/x64-windows-static/include $(INCLUDES)
 
 DEFINES = $(DEFINES) -DHAVE_ICONV
-LIBS = $(LIBS) /libpath:$(VCPKG_ROOT)/installed/x64-windows-static/lib libiconv.lib libcharset.lib
+LIBS = $(LIBS) /libpath:$(VCPKG_ROOT)/installed/x64-windows-static/lib iconv.lib charset.lib
 
 DEFINES = $(DEFINES) -DHAVE_LIBYAML=1 -DYAML_DECLARE_STATIC
 LIBS = $(LIBS) /libpath:$(VCPKG_ROOT)/installed/x64-windows-static/lib yaml.lib
